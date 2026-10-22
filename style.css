@@ -27,13 +27,14 @@ h2 { font-size: 1.2rem; }
 button, input { font: inherit; color: inherit; }
 
 .top {
-  background: linear-gradient(180deg, #2a1838, var(--bg));
+  background: linear-gradient(180deg, rgba(42, 24, 56, .9), rgba(21, 17, 28, 0));
   padding: 28px 0 20px;
 }
 .top h1 { font-size: clamp(1.6rem, 5vw, 2.4rem); }
 .stats { margin: 6px 0 0; color: var(--muted); }
 
 main { padding-bottom: 64px; }
+.top, main { position: relative; z-index: 1; }
 section { margin-top: 20px; }
 
 /* Leader banner */
@@ -154,3 +155,27 @@ button:disabled { opacity: .6; cursor: progress; }
 .mode-banner button { padding: 6px 10px; font-size: .85rem; background: var(--border); }
 .mode-banner button.danger { background: var(--danger); color: #2b0000; }
 .load-error { margin: 16px 0 0; padding: 10px 12px; border-radius: 10px; background: #3a1b22; color: var(--danger); }
+
+/* Background characters (decor.js) */
+.decor { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.decor img { display: block; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .45)); }
+.decor-side {
+  position: absolute; top: var(--top); height: var(--h); max-width: 16vw; width: auto; object-fit: contain;
+  transform: rotate(var(--r));
+  animation: bob 5s ease-in-out var(--delay) infinite;
+}
+.decor-left { left: var(--x); }
+.decor-right { right: var(--x); }
+@keyframes bob { 50% { transform: translateY(-8px) rotate(calc(var(--r) * .6)); } }
+.decor-bottom { position: absolute; bottom: 0; display: flex; align-items: flex-end; }
+.decor-bottom-left { left: 0; }
+.decor-bottom-right { right: 0; flex-direction: row-reverse; }
+.decor-bottom img { height: clamp(90px, 22vh, 210px); max-width: 22vw; object-fit: contain; object-position: bottom; position: relative; }
+.decor-bottom-left img + img { margin-left: -2vw; }
+.decor-bottom-right img + img { margin-right: -2vw; }
+@media (max-width: 800px) {
+  .decor-side { opacity: .3; }
+  .decor-bottom { opacity: .5; }
+  .decor-bottom img { max-width: 30vw; }
+}
+@media (prefers-reduced-motion: reduce) { .decor-side { animation: none; } }

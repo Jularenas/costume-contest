@@ -9,4 +9,21 @@ window.CONTEST_CONFIG = {
 
   // Open the site with ?admin=<this> to get Remove / Reset buttons.
   adminKey: 'pumpkin',
+
+  // Background characters, files in img/characters/. Add a line to add one.
+  // edge: 'side' (default) spreads them down the left/right edges;
+  // 'bottom-left' / 'bottom-right' sit cut-off pictures on the bottom corners
+  // (first listed goes closest to the corner).
+  decorations: [
+    { src: 'vampiro.webp' },
+    { src: 'cafe.webp' },
+    { src: 'presidente.webp' },
+    { src: 'karol-feid.webp' },
+    { src: 'super-mama.webp' },
+    { src: 'super-papa.webp' },
+    { src: 'muy-buenos-dias.webp', edge: 'bottom-left' },
+    { src: 'zorro-rojo.webp', edge: 'bottom-left' },
+    { src: 'minnie-mickey.webp', edge: 'bottom-right' },
+    { src: 'aurelio.webp', edge: 'bottom-right' },
+  ],
 };
