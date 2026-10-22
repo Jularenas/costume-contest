@@ -23,3 +23,7 @@ drop policy if exists "open access" on costumes;
 drop policy if exists "open access" on votes;
 create policy "open access" on costumes for all to anon using (true) with check (true);
 create policy "open access" on votes for all to anon using (true) with check (true);
+
+-- Newer Supabase projects don't grant table access to the public (anon) key by default.
+grant select, insert, update, delete on costumes, votes to anon;
+grant usage on all sequences in schema public to anon;
