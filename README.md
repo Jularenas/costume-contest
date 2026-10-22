@@ -66,3 +66,4 @@ Open the site with `?admin=pumpkin`, or whatever `adminKey` is set to in `config
 
 - "One vote" is per browser, using a random ID kept in the browser's storage. Someone could vote again from a private window or a second device.
 - Photos are stored as compressed JPEG data in the database, which is fine for a party-sized contest.
+- `index.html` loads CSS and JS with a fresh `?v=` each visit, so changes show up right after a deploy. Only `index.html` itself can be cached (up to 10 minutes) by GitHub Pages.

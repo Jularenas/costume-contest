@@ -5,7 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Costume Contest</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎃</text></svg>">
-  <link rel="stylesheet" href="style.css">
+  <script>
+    // GitHub Pages caches files for 10 minutes; a fresh query string means
+    // every visit gets the latest CSS/JS right after a push.
+    window.BUILD = Date.now();
+    document.write('<link rel="stylesheet" href="style.css?v=' + BUILD + '">');
+  </script>
 </head>
 <body>
   <header class="top">
@@ -56,8 +61,10 @@
   </main>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="config.js"></script>
-  <script src="store.js"></script>
-  <script src="app.js"></script>
+  <script>
+    for (const f of ['config.js', 'store.js', 'app.js']) {
+      document.write('<script src="' + f + '?v=' + BUILD + '"><\/script>');
+    }
+  </script>
 </body>
 </html>
