@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Costume Contest</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎃</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <h1 id="title">🎃 Costume Contest</h1>
+      <p class="stats" id="stats">Loading…</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="mode-banner" id="mode-banner" hidden></div>
+    <p class="load-error" id="load-error" role="alert" hidden></p>
+    <section class="leader" id="leader" hidden></section>
+
+    <section class="panel">
+      <details id="enter" open>
+        <summary><h2>Enter your costume</h2></summary>
+        <form id="entry-form" autocomplete="off">
+          <label class="photo-drop" id="photo-drop">
+            <input type="file" id="photo" accept="image/*" required>
+            <img id="preview" alt="" hidden>
+            <span id="photo-hint">📷 Tap to add a photo</span>
+          </label>
+          <div class="fields">
+            <label><span>Costume name</span>
+              <input id="name" maxlength="60" placeholder="e.g. Spooky Skeleton" required>
+            </label>
+            <label><span>Your name <span class="opt">(optional)</span></span>
+              <input id="entrant" maxlength="60" placeholder="e.g. Sam">
+            </label>
+            <div id="matches" class="matches" hidden></div>
+            <button type="submit" class="primary" id="submit">Post costume</button>
+            <p class="error" id="form-error" role="alert"></p>
+          </div>
+        </form>
+      </details>
+    </section>
+
+    <section>
+      <div class="gallery-head">
+        <h2>Vote for the best costume</h2>
+        <input type="search" id="search" placeholder="Find a costume…" aria-label="Find a costume">
+      </div>
+      <p class="hint">You get one vote. Changed your mind? Tap another costume to move it.</p>
+      <div class="grid" id="grid"></div>
+      <p class="empty" id="empty" hidden>No costumes yet — be the first to enter!</p>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="config.js"></script>
+  <script src="store.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

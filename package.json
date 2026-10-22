@@ -1,0 +1,9 @@
+{
+  "name": "costume-contest",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A tiny costume contest site: post a photo, vote once, see the leaderboard.",
+  "scripts": {
+    "start": "node dev-server.js"
+  }
+}
