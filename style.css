@@ -177,5 +177,6 @@ button:disabled { opacity: .6; cursor: progress; }
   .decor-side { opacity: .3; }
   .decor-bottom { opacity: .5; }
   .decor-bottom img { max-width: 30vw; }
+  .decor-bottom img:nth-child(n+3) { display: none; } /* two per corner on phones */
 }
 @media (prefers-reduced-motion: reduce) { .decor-side { animation: none; } }
