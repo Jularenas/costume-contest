@@ -185,6 +185,12 @@ document.addEventListener('click', async (e) => {
   }
   if (act && act.dataset.act === 'publish-anyway') return publish();
   if (act && act.dataset.act === 'cancel-dupe') return hideDupePrompt();
+  if (act && act.dataset.act === 'go-search') {
+    e.preventDefault(); // the link sits in the form's header; don't toggle the form
+    $('search').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    $('search').focus({ preventScroll: true });
+    return;
+  }
   if (act && act.dataset.act === 'reset') {
     if (!confirm('¿Borrar TODOS los disfraces y votos? Esto no se puede deshacer.')) return;
     try { await store.reset(); await refresh(); toast('Concurso borrado'); }

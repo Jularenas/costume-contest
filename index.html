@@ -30,7 +30,13 @@
 
     <section class="panel">
       <details id="enter" open>
-        <summary><h2>Inscribe tu disfraz</h2></summary>
+        <summary>
+          <div>
+            <h2>Inscribe tu disfraz</h2>
+            <p class="subtext">¿Alguien ya lo publicó? <a href="#search" data-act="go-search">Busca tu disfraz primero</a>
+              y, si ya está, vota por él en vez de publicarlo otra vez.</p>
+          </div>
+        </summary>
         <form id="entry-form" autocomplete="off" novalidate>
           <label class="photo-drop" id="photo-drop">
             <input type="file" id="photo" accept="image/*" required>

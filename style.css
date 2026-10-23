@@ -55,6 +55,9 @@ details > summary { list-style: none; cursor: pointer; padding: 16px; display: f
 details > summary::-webkit-details-marker { display: none; }
 details > summary::after { content: "＋"; color: var(--muted); font-size: 1.3rem; }
 details[open] > summary::after { content: "－"; }
+details > summary { gap: 12px; }
+.subtext { margin: 4px 0 0; color: var(--muted); font-size: .88rem; line-height: 1.4; }
+.subtext a { color: var(--accent); font-weight: 600; }
 form { display: grid; grid-template-columns: 220px 1fr; gap: 16px; padding: 0 16px 16px; }
 @media (max-width: 600px) { form { grid-template-columns: 1fr; } }
 
