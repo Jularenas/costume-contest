@@ -19,7 +19,7 @@ if (mode === 'shared' && !configured) mode = 'local';
 const safeGet = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
 const safeSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { throw quotaError(e); } };
 const quotaError = (e) =>
-  e && e.name === 'QuotaExceededError' ? new Error('This browser is out of space for test photos. Use "Clear data".') : e;
+  e && e.name === 'QuotaExceededError' ? new Error('Este navegador se quedó sin espacio para las fotos de prueba. Usa "Borrar datos".') : e;
 
 function voterId() {
   let id = safeGet('cc-voter');
@@ -52,7 +52,7 @@ const LocalStore = {
     const d = this.read();
     if (costumeId === null) delete d.votes[voter];
     else if (d.costumes.some((c) => c.id === costumeId)) d.votes[voter] = costumeId;
-    else throw new Error('That costume no longer exists.');
+    else throw new Error('Ese disfraz ya no existe.');
     this.write(d);
   },
   async remove(id) {
@@ -71,7 +71,7 @@ function loadScript(src) {
     const s = document.createElement('script');
     s.src = src;
     s.onload = resolve;
-    s.onerror = () => reject(new Error('Could not load the Supabase library.'));
+    s.onerror = () => reject(new Error('No se pudo cargar la librería de Supabase.'));
     document.head.append(s);
   });
 }
@@ -118,7 +118,7 @@ const SharedStore = {
     const { error } = costumeId === null
       ? await db.from('votes').delete().eq('voter_id', voter)
       : await db.from('votes').upsert({ voter_id: voter, costume_id: costumeId, voted_at: new Date().toISOString() });
-    if (error) throw new Error(error.code === '23503' ? 'That costume no longer exists.' : error.message);
+    if (error) throw new Error(error.code === '23503' ? 'Ese disfraz ya no existe.' : error.message);
   },
   async remove(id) {
     const db = await this.db();

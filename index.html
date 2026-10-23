@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Costume Contest</title>
+  <title>Concurso de Disfraces</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎃</text></svg>">
   <script>
     // GitHub Pages caches files for 10 minutes; a fresh query string means
@@ -15,8 +15,8 @@
 <body>
   <header class="top">
     <div class="wrap">
-      <h1 id="title">🎃 Costume Contest</h1>
-      <p class="stats" id="stats">Loading…</p>
+      <h1 id="title">🎃 Concurso de Disfraces</h1>
+      <p class="stats" id="stats">Cargando…</p>
     </div>
   </header>
 
@@ -27,22 +27,22 @@
 
     <section class="panel">
       <details id="enter" open>
-        <summary><h2>Enter your costume</h2></summary>
-        <form id="entry-form" autocomplete="off">
+        <summary><h2>Inscribe tu disfraz</h2></summary>
+        <form id="entry-form" autocomplete="off" novalidate>
           <label class="photo-drop" id="photo-drop">
             <input type="file" id="photo" accept="image/*" required>
             <img id="preview" alt="" hidden>
-            <span id="photo-hint">📷 Tap to add a photo</span>
+            <span id="photo-hint">📷 Toca para agregar una foto</span>
           </label>
           <div class="fields">
-            <label><span>Costume name</span>
-              <input id="name" maxlength="60" placeholder="e.g. Spooky Skeleton" required>
+            <label><span>Nombre del disfraz</span>
+              <input id="name" maxlength="60" placeholder="ej. Esqueleto Tenebroso" required>
             </label>
-            <label><span>Your name <span class="opt">(optional)</span></span>
-              <input id="entrant" maxlength="60" placeholder="e.g. Sam">
+            <label><span>Tu nombre <span class="opt">(opcional)</span></span>
+              <input id="entrant" maxlength="60" placeholder="ej. Camila">
             </label>
             <div id="matches" class="matches" hidden></div>
-            <button type="submit" class="primary" id="submit">Post costume</button>
+            <button type="submit" class="primary" id="submit">Publicar disfraz</button>
             <p class="error" id="form-error" role="alert"></p>
           </div>
         </form>
@@ -51,12 +51,12 @@
 
     <section>
       <div class="gallery-head">
-        <h2>Vote for the best costume</h2>
-        <input type="search" id="search" placeholder="Find a costume…" aria-label="Find a costume">
+        <h2>Vota por el mejor disfraz</h2>
+        <input type="search" id="search" placeholder="Buscar un disfraz…" aria-label="Buscar un disfraz">
       </div>
-      <p class="hint">You get one vote. Changed your mind? Tap another costume to move it.</p>
+      <p class="hint">Tienes un solo voto. ¿Cambiaste de opinión? Toca otro disfraz para mover tu voto.</p>
       <div class="grid" id="grid"></div>
-      <p class="empty" id="empty" hidden>No costumes yet — be the first to enter!</p>
+      <p class="empty" id="empty" hidden>Aún no hay disfraces. ¡Sé el primero en participar!</p>
     </section>
   </main>
 

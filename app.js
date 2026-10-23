@@ -13,7 +13,7 @@ try {
 
 const norm = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 const clean = (s, max) => s.replace(/\s+/g, ' ').trim().slice(0, max);
 
 function toast(msg) {
@@ -45,7 +45,7 @@ async function refresh() {
     render();
   } catch (err) {
     $('load-error').hidden = false;
-    $('load-error').textContent = `Can't reach the contest right now (${err.message}). Retrying…`;
+    $('load-error').textContent = `No se puede conectar con el concurso en este momento (${err.message}). Reintentando…`;
   }
 }
 
@@ -58,19 +58,19 @@ function renderBanner() {
   const parts = [];
   if (store.mode === 'local') {
     parts.push(store.isLocalhost
-      ? `<strong>Test mode</strong> — data is saved in this browser only. Voter <code>${voter.slice(0, 6)}</code>`
-      : '<strong>Demo mode</strong> — entries and votes are saved on this device only.');
-    if (store.isLocalhost) parts.push('<button data-act="new-voter">Be a new voter</button>');
+      ? `<strong>Modo de prueba</strong> — los datos se guardan solo en este navegador. Votante <code>${voter.slice(0, 6)}</code>`
+      : '<strong>Modo demo</strong> — los disfraces y votos se guardan solo en este dispositivo.');
+    if (store.isLocalhost) parts.push('<button data-act="new-voter">Ser un votante nuevo</button>');
   } else {
-    parts.push('<strong>Admin</strong> — live shared contest.');
+    parts.push('<strong>Admin</strong> — concurso compartido en vivo.');
   }
-  if (store.isLocalhost || isAdmin) parts.push(`<button data-act="reset" class="danger">${store.mode === 'shared' ? 'Wipe contest' : 'Clear data'}</button>`);
+  if (store.isLocalhost || isAdmin) parts.push(`<button data-act="reset" class="danger">${store.mode === 'shared' ? 'Borrar concurso' : 'Borrar datos'}</button>`);
   b.innerHTML = parts.join(' ');
 }
 
 function render() {
   const { costumes, myVote, totalVotes } = state;
-  $('stats').textContent = `${plural(costumes.length, 'costume')} · ${plural(totalVotes, 'vote')}`;
+  $('stats').textContent = `${plural(costumes.length, 'disfraz', 'disfraces')} · ${plural(totalVotes, 'voto', 'votos')}`;
 
   const lead = costumes[0];
   const leader = $('leader');
@@ -80,10 +80,10 @@ function render() {
     leader.innerHTML = `
       <img src="${lead.image}" alt="">
       <div>
-        <div class="label">${tied > 1 ? `Tied for first (${tied} costumes)` : 'Currently winning'}</div>
+        <div class="label">${tied > 1 ? `Empate en primer lugar (${tied} disfraces)` : 'Va ganando'}</div>
         <div class="who">${esc(lead.name)}</div>
       </div>
-      <div class="count">${lead.votes}<small>${lead.votes === 1 ? 'vote' : 'votes'}</small></div>`;
+      <div class="count">${lead.votes}<small>${lead.votes === 1 ? 'voto' : 'votos'}</small></div>`;
   }
 
   const term = norm($('search').value);
@@ -96,7 +96,7 @@ function render() {
 
   const empty = $('empty');
   empty.hidden = shown.length > 0;
-  empty.textContent = costumes.length ? 'No costumes match your search.' : 'No costumes yet — be the first to enter!';
+  empty.textContent = costumes.length ? 'Ningún disfraz coincide con tu búsqueda.' : 'Aún no hay disfraces. ¡Sé el primero en participar!';
 
   $('grid').innerHTML = shown.map((c) => {
     const rank = rankOf.get(c.id);
@@ -104,15 +104,15 @@ function render() {
     return `
       <article class="card${mine ? ' mine' : ''}" data-id="${c.id}">
         <span class="rank${c.votes && rank <= 3 ? ` r${rank}` : ''}">#${rank}</span>
-        ${isAdmin || store.isLocalhost ? `<button class="remove" data-remove="${c.id}" title="Remove entry">Remove</button>` : ''}
+        ${isAdmin || store.isLocalhost ? `<button class="remove" data-remove="${c.id}" title="Quitar disfraz">Quitar</button>` : ''}
         <img src="${c.image}" alt="${esc(c.name)}" loading="lazy" data-zoom>
         <div class="card-body">
           <div class="card-title">${esc(c.name)}</div>
-          ${c.entrant ? `<div class="card-by">by ${esc(c.entrant)}</div>` : ''}
+          ${c.entrant ? `<div class="card-by">por ${esc(c.entrant)}</div>` : ''}
           <div class="bar"><i style="width:${(c.votes / max) * 100}%"></i></div>
           <div class="card-foot">
-            <span class="votes">${c.votes} <small>${c.votes === 1 ? 'vote' : 'votes'}</small></span>
-            <button class="vote" data-vote="${c.id}">${mine ? '✓ Your vote' : 'Vote'}</button>
+            <span class="votes">${c.votes} <small>${c.votes === 1 ? 'voto' : 'votos'}</small></span>
+            <button class="vote" data-vote="${c.id}">${mine ? '✓ Tu voto' : 'Votar'}</button>
           </div>
         </div>
       </article>`;
@@ -132,11 +132,11 @@ function renderMatches() {
     return n.includes(term) || term.includes(n);
   }).slice(0, 3);
   box.hidden = hits.length === 0;
-  box.innerHTML = hits.length ? `<p>Already here? Vote for it instead of posting again:</p>` + hits.map((c) => `
+  box.innerHTML = hits.length ? `<p>¿Ya está aquí? Vota por él en vez de publicarlo otra vez:</p>` + hits.map((c) => `
     <div class="match">
       <img src="${c.image}" alt="">
       <span>${esc(c.name)}${c.entrant ? ` · ${esc(c.entrant)}` : ''}</span>
-      <button type="button" data-vote="${c.id}">${c.id === state.myVote ? '✓ Voted' : 'Vote'}</button>
+      <button type="button" data-vote="${c.id}">${c.id === state.myVote ? '✓ Votado' : 'Votar'}</button>
     </div>`).join('') : '';
 }
 
@@ -148,7 +148,7 @@ async function vote(id) {
     await store.vote(voter, undo ? null : id);
     await refresh();
     const c = state.costumes.find((x) => x.id === id);
-    toast(undo ? 'Vote removed' : `Voted for ${c ? c.name : 'that costume'} 🎉`);
+    toast(undo ? 'Voto quitado' : `Votaste por ${c ? c.name : 'ese disfraz'} 🎉`);
   } catch (err) {
     toast(err.message);
     refresh();
@@ -161,8 +161,8 @@ document.addEventListener('click', async (e) => {
 
   const r = e.target.closest('[data-remove]');
   if (r) {
-    if (!confirm('Remove this entry and its votes?')) return;
-    try { await store.remove(Number(r.dataset.remove)); await refresh(); toast('Entry removed'); }
+    if (!confirm('¿Quitar este disfraz y sus votos?')) return;
+    try { await store.remove(Number(r.dataset.remove)); await refresh(); toast('Disfraz quitado'); }
     catch (err) { toast(err.message); }
     return;
   }
@@ -171,11 +171,11 @@ document.addEventListener('click', async (e) => {
   if (act && act.dataset.act === 'new-voter') {
     voter = store.newVoter();
     await refresh();
-    return toast('You are now a new voter');
+    return toast('Ahora eres un votante nuevo');
   }
   if (act && act.dataset.act === 'reset') {
-    if (!confirm('Delete ALL costumes and votes? This cannot be undone.')) return;
-    try { await store.reset(); await refresh(); toast('Contest wiped'); }
+    if (!confirm('¿Borrar TODOS los disfraces y votos? Esto no se puede deshacer.')) return;
+    try { await store.reset(); await refresh(); toast('Concurso borrado'); }
     catch (err) { toast(err.message); }
     return;
   }
@@ -219,7 +219,7 @@ $('photo').addEventListener('change', async (e) => {
     $('photo-hint').hidden = true;
   } catch {
     photoData = null;
-    $('form-error').textContent = "Couldn't read that photo. Try a JPEG or PNG.";
+    $('form-error').textContent = 'No se pudo leer esa foto. Prueba con un JPEG o PNG.';
   }
 });
 
@@ -231,11 +231,11 @@ $('entry-form').addEventListener('submit', async (e) => {
   const err = $('form-error');
   err.textContent = '';
   const name = clean($('name').value, 60);
-  if (!name) return (err.textContent = 'Give your costume a name.');
-  if (!photoData) return (err.textContent = 'Add a photo of your costume.');
+  if (!name) return (err.textContent = 'Ponle un nombre a tu disfraz.');
+  if (!photoData) return (err.textContent = 'Agrega una foto de tu disfraz.');
   const btn = $('submit');
   btn.disabled = true;
-  btn.textContent = 'Posting…';
+  btn.textContent = 'Publicando…';
   try {
     const id = await store.addCostume({ name, entrant: clean($('entrant').value, 60), image: photoData });
     $('entry-form').reset();
@@ -244,7 +244,7 @@ $('entry-form').addEventListener('submit', async (e) => {
     $('preview').hidden = true;
     $('photo-hint').hidden = false;
     await refresh();
-    toast('Costume posted! 🎃');
+    toast('¡Disfraz publicado! 🎃');
     const card = document.querySelector(`.card[data-id="${id}"]`);
     if (card) {
       card.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -254,7 +254,7 @@ $('entry-form').addEventListener('submit', async (e) => {
     err.textContent = ex.message;
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Post costume';
+    btn.textContent = 'Publicar disfraz';
   }
 });
 
