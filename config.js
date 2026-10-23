@@ -21,6 +21,7 @@ window.CONTEST_CONFIG = {
     { src: 'karol-feid.webp' },
     { src: 'super-mama.webp' },
     { src: 'super-papa.webp' },
+    { src: 'gansito.webp' },
     { src: 'muy-buenos-dias.webp', edge: 'bottom-left' },
     { src: 'zorro-rojo.webp', edge: 'bottom-left' },
     { src: 'minnie-mickey.webp', edge: 'bottom-right' },
