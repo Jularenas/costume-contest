@@ -180,3 +180,23 @@ button:disabled { opacity: .6; cursor: progress; }
   .decor-bottom img:nth-child(n+3) { display: none; } /* two per corner on phones */
 }
 @media (prefers-reduced-motion: reduce) { .decor-side { animation: none; } }
+
+/* Countdown (header) */
+.top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.countdown {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  background: rgba(33, 26, 44, .85); border: 1px solid var(--accent); border-radius: var(--radius);
+  padding: 10px 16px;
+}
+.cd-label { color: var(--accent); font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.cd-units { display: flex; gap: 6px; }
+.cd-units div { display: flex; flex-direction: column; align-items: center; min-width: 52px; }
+.cd-units b { font-size: 1.8rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.cd-units small { color: var(--muted); font-size: .7rem; margin-top: 3px; }
+.cd-when { color: var(--muted); font-size: .75rem; }
+.cd-when::first-letter { text-transform: uppercase; }
+.countdown.done .cd-done { font-size: 1.3rem; font-weight: 800; color: var(--accent); }
+@media (max-width: 600px) {
+  .countdown { width: 100%; }
+  .cd-units b { font-size: 1.6rem; }
+}

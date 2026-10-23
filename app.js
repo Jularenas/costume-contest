@@ -258,6 +258,40 @@ $('entry-form').addEventListener('submit', async (e) => {
   }
 });
 
+// ---------- Countdown ----------
+
+function startCountdown() {
+  const cd = cfg.countdown;
+  const target = cd && Date.parse(cd.to);
+  if (!target) return;
+  const box = $('countdown');
+  const when = new Intl.DateTimeFormat('es-CO', {
+    weekday: 'long', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'America/Bogota',
+  }).format(target);
+  const pad = (n) => String(n).padStart(2, '0');
+  const unit = (n, one, many) => `<div><b>${pad(n)}</b><small>${n === 1 ? one : many}</small></div>`;
+
+  function tick() {
+    const left = Math.max(0, Math.floor((target - Date.now()) / 1000));
+    box.hidden = false;
+    if (!left) {
+      box.classList.add('done');
+      box.innerHTML = `<span class="cd-done">${esc(cd.done || '¡Llegó la hora!')}</span><span class="cd-when">${when}</span>`;
+      return clearInterval(timer);
+    }
+    const d = Math.floor(left / 86400), h = Math.floor(left / 3600) % 24, m = Math.floor(left / 60) % 60, s = left % 60;
+    box.innerHTML = `
+      <span class="cd-label">${esc(cd.label || 'Faltan')}</span>
+      <div class="cd-units">
+        ${d ? unit(d, 'día', 'días') : ''}${unit(h, 'hora', 'horas')}${unit(m, 'min', 'min')}${unit(s, 'seg', 'seg')}
+      </div>
+      <span class="cd-when">${when}</span>`;
+  }
+  const timer = setInterval(tick, 1000);
+  tick();
+}
+startCountdown();
+
 // ---------- Start + live updates ----------
 
 if (cfg.title) {

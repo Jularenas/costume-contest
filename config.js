@@ -10,6 +10,14 @@ window.CONTEST_CONFIG = {
   // Open the site with ?admin=<this> to get Remove / Reset buttons.
   adminKey: 'pumpkin',
 
+  // Countdown in the header, fixed to Bogotá time (UTC-5) so every phone shows the same moment.
+  // Remove this block to hide it.
+  countdown: {
+    to: '2026-10-24T01:00:00-05:00',
+    label: 'Faltan',
+    done: '¡Llegó la hora! 🎃',
+  },
+
   // Background characters, files in img/characters/. Add a line to add one.
   // edge: 'side' (default) spreads them down the left/right edges;
   // 'bottom-left' / 'bottom-right' sit cut-off pictures on the bottom corners
