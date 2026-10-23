@@ -45,6 +45,7 @@
               <input id="entrant" maxlength="60" placeholder="ej. Camila">
             </label>
             <div id="matches" class="matches" hidden></div>
+            <div id="dupe-prompt" class="dupe-prompt" role="alert" hidden></div>
             <button type="submit" class="primary" id="submit">Publicar disfraz</button>
             <p class="error" id="form-error" role="alert"></p>
           </div>
@@ -65,7 +66,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script>
-    for (const f of ['config.js', 'decor.js', 'store.js', 'app.js']) {
+    for (const f of ['config.js', 'decor.js', 'store.js', 'dupes.js', 'app.js']) {
       document.write('<script src="' + f + '?v=' + BUILD + '"><\/script>');
     }
   </script>

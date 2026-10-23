@@ -200,3 +200,13 @@ button:disabled { opacity: .6; cursor: progress; }
   .countdown { width: 100%; }
   .cd-units b { font-size: 1.6rem; }
 }
+
+/* Possible-duplicate prompt in the entry form */
+.dupe-prompt { background: #3a2a14; border: 1px solid var(--accent); border-radius: 10px; padding: 12px; font-size: .9rem; }
+.dupe-prompt p { margin: 0 0 8px; }
+.dupe-prompt .match em { display: block; font-style: normal; font-size: .78rem; color: var(--accent); }
+.dupe-prompt .match span { white-space: normal; }
+.dupe-prompt .match button { background: var(--accent); color: var(--accent-ink); }
+.dupe-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.dupe-actions button { flex: 1 1 auto; }
+.dupe-actions button:not(.primary) { background: var(--border); }

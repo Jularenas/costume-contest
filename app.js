@@ -11,7 +11,7 @@ try {
   isAdmin = Boolean(cfg.adminKey) && sessionStorage.getItem('cc-admin') === cfg.adminKey;
 } catch {}
 
-const norm = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+const norm = (s) => Dupes.fold(s).replace(/[^a-z0-9]+/g, ' ').trim();
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 const clean = (s, max) => s.replace(/\s+/g, ' ').trim().slice(0, max);
@@ -125,12 +125,14 @@ function render() {
 // While someone types a costume name, surface entries that look the same so
 // duplicate costumes get voted for instead of entered twice.
 function renderMatches() {
-  const term = norm($('name').value);
+  const typed = $('name').value;
   const box = $('matches');
-  const hits = term.length < 3 ? [] : state.costumes.filter((c) => {
-    const n = norm(c.name);
-    return n.includes(term) || term.includes(n);
-  }).slice(0, 3);
+  const hits = !$('dupe-prompt').hidden || norm(typed).length < 3 ? [] : state.costumes
+    .map((c) => ({ c, score: Math.max(Dupes.nameScore(typed, c.name), Dupes.startsLike(typed, c.name) ? 0.9 : 0) }))
+    .filter((x) => x.score >= 0.8)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map((x) => x.c);
   box.hidden = hits.length === 0;
   box.innerHTML = hits.length ? `<p>¿Ya está aquí? Vota por él en vez de publicarlo otra vez:</p>` + hits.map((c) => `
     <div class="match">
@@ -157,7 +159,14 @@ async function vote(id) {
 
 document.addEventListener('click', async (e) => {
   const v = e.target.closest('[data-vote]');
-  if (v) return vote(Number(v.dataset.vote));
+  if (v) {
+    if (v.closest('#dupe-prompt')) {
+      if (state.myVote !== Number(v.dataset.vote)) await vote(Number(v.dataset.vote));
+      else toast('Ya habías votado por ese disfraz');
+      return resetEntryForm();
+    }
+    return vote(Number(v.dataset.vote));
+  }
 
   const r = e.target.closest('[data-remove]');
   if (r) {
@@ -170,9 +179,12 @@ document.addEventListener('click', async (e) => {
   const act = e.target.closest('[data-act]');
   if (act && act.dataset.act === 'new-voter') {
     voter = store.newVoter();
+    try { localStorage.removeItem('cc-my-posts'); } catch {}
     await refresh();
     return toast('Ahora eres un votante nuevo');
   }
+  if (act && act.dataset.act === 'publish-anyway') return publish();
+  if (act && act.dataset.act === 'cancel-dupe') return hideDupePrompt();
   if (act && act.dataset.act === 'reset') {
     if (!confirm('¿Borrar TODOS los disfraces y votos? Esto no se puede deshacer.')) return;
     try { await store.reset(); await refresh(); toast('Concurso borrado'); }
@@ -223,8 +235,51 @@ $('photo').addEventListener('change', async (e) => {
   }
 });
 
-$('name').addEventListener('input', renderMatches);
+$('name').addEventListener('input', () => { hideDupePrompt(); renderMatches(); });
+$('photo').addEventListener('change', hideDupePrompt);
 $('search').addEventListener('input', render);
+
+// Costumes posted from this browser, to ask before someone posts a second one.
+const myPosts = {
+  get() { try { return JSON.parse(localStorage.getItem('cc-my-posts')) || []; } catch { return []; } },
+  add(id) { try { localStorage.setItem('cc-my-posts', JSON.stringify([...this.get(), id])); } catch {} },
+};
+
+function resetEntryForm() {
+  $('entry-form').reset();
+  photoData = null;
+  $('preview').hidden = true;
+  $('photo-hint').hidden = false;
+  hideDupePrompt();
+  renderMatches();
+}
+
+function hideDupePrompt() {
+  $('dupe-prompt').hidden = true;
+  $('submit').hidden = false;
+}
+
+function showDupePrompt(matches) {
+  const box = $('dupe-prompt');
+  box.innerHTML = `
+    <p><strong>¿Ya está publicado?</strong> Encontramos ${matches.length === 1 ? 'un disfraz parecido' : 'disfraces parecidos'}.
+    Si es el mismo, mejor vota por él.</p>
+    ${matches.slice(0, 4).map(({ costume: c, reasons }) => `
+      <div class="match">
+        <img src="${c.image}" alt="">
+        <span>${esc(c.name)}${c.entrant ? ` · ${esc(c.entrant)}` : ''}
+          <em>${reasons.map(esc).join(' · ')}</em></span>
+        <button type="button" data-vote="${c.id}">${c.id === state.myVote ? '✓ Votado' : 'Es este, votar'}</button>
+      </div>`).join('')}
+    <div class="dupe-actions">
+      <button type="button" class="primary" data-act="publish-anyway">Es otro disfraz, publicar</button>
+      <button type="button" data-act="cancel-dupe">Cancelar</button>
+    </div>`;
+  box.hidden = false;
+  $('matches').hidden = true;
+  $('submit').hidden = true;
+  box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
 
 $('entry-form').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -233,16 +288,39 @@ $('entry-form').addEventListener('submit', async (e) => {
   const name = clean($('name').value, 60);
   if (!name) return (err.textContent = 'Ponle un nombre a tu disfraz.');
   if (!photoData) return (err.textContent = 'Agrega una foto de tu disfraz.');
+
   const btn = $('submit');
+  btn.disabled = true;
+  btn.textContent = 'Revisando…';
+  try {
+    await refresh(); // compare against the latest entries
+    const matches = await Dupes.find(state.costumes, name, photoData);
+    const posted = myPosts.get();
+    for (const c of state.costumes) {
+      if (!posted.includes(c.id)) continue;
+      const m = matches.find((x) => x.costume.id === c.id);
+      if (m) m.reasons.push('Publicado desde este teléfono');
+      else matches.push({ costume: c, reasons: ['Publicado desde este teléfono'] });
+    }
+    if (matches.length) return showDupePrompt(matches);
+    await publish();
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Publicar disfraz';
+  }
+});
+
+async function publish() {
+  const err = $('form-error');
+  const name = clean($('name').value, 60);
+  const btn = $('dupe-prompt').hidden ? $('submit') : $('dupe-prompt').querySelector('[data-act="publish-anyway"]');
   btn.disabled = true;
   btn.textContent = 'Publicando…';
   try {
     const id = await store.addCostume({ name, entrant: clean($('entrant').value, 60), image: photoData });
-    $('entry-form').reset();
+    myPosts.add(id);
+    resetEntryForm();
     $('search').value = '';
-    photoData = null;
-    $('preview').hidden = true;
-    $('photo-hint').hidden = false;
     await refresh();
     toast('¡Disfraz publicado! 🎃');
     const card = document.querySelector(`.card[data-id="${id}"]`);
@@ -254,9 +332,9 @@ $('entry-form').addEventListener('submit', async (e) => {
     err.textContent = ex.message;
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Publicar disfraz';
+    btn.textContent = btn.id === 'submit' ? 'Publicar disfraz' : 'Es otro disfraz, publicar';
   }
-});
+}
 
 // ---------- Countdown ----------
 
